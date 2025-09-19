@@ -43,7 +43,7 @@ There will be two components to our lighting system: phong lighting and shadow m
 * Enemy type that moves in straight line toward player
 * Players die when colliding with enemies
 * Phong lighting implementation
-* Point and cone lights illuminate enviornment withing radius
+* Point and cone lights illuminate enviornment within radius
 * Server and client connection
 
 ## Final Goals
@@ -52,13 +52,16 @@ There will be two components to our lighting system: phong lighting and shadow m
 * 02%: Batteries will be situated throughout the level, and are collected when a player collides with the item. Playing without a flashlight will cause a sanity value to slowly decrease, killing the player when depleted. Also, a player with a depleted flashlight won't be able to see enemies coming through the darkness.
 * 01%: Revive kits will be situated throughout the level, and are collected during collision. Up to 1 can be held at a time, indicated by a UI element. Revive kits are used at the body of a dead player to restore their life.
 * 01%: Ammunition can be collected, and the current amount is represented by a UI element. Available ammunition is reduced when attacking.
-* 01%: Three enemy types will be present: Balanced, Fast and weak (Comes in groups of up to 5), slow and strong (Rare encounter) At each location, there will be 10 - 30 different instances of enemies.
-* 05%: Win state: all players reach the end of the level
-* 05%: Lose state: all players are simultaneously dead
-* 04% Signed distance field implemented
-* 02% Normal maps computed for all lit sprites
-* 04% Phong lighting computer per-pixel for all lit sprites on screen
+* 02%: Three enemy types will be present: Balanced, Fast and weak (Comes in groups of up to 5), slow and strong (Rare encounter). At each location, there will be 10 - 30 different instances.
+* 01%: Win state: all players reach the end of the level
+* 01%: Lose state: all players are simultaneously dead
+* 08%: Signed distance field implemented
+* 12%: Screen-space shadow maps implemented
+* 08%: Point and cone lights illuminate enviornment within radius
+* 02%: Normal maps computed for all lit sprites
+* 08% Phong lighting computed per-pixel for all lit sprites on screen
 * 10%: Player input data recording and server validation (lag compensation)
+* 12%: Server-client interface: server is run on host's machine
 
 ## Stretch Goals
 

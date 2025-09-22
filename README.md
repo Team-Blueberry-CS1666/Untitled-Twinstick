@@ -48,11 +48,11 @@ There will be two components to our lighting system: phong lighting and shadow m
 
 ## Final Goals
 
-* 10%: 100x100 tile level (Each tile is 64x64 pixels) with 4 distinct buildings that players will venture through toward their goal. Entire level will be composed of 20 handmade tile assets that make up walls, doors, and other props, where at least 10 of which are lit (include normal information).
+* 10%: 100x100 tile level (Each tile is 64x64 pixels) with 3 distinct buildings that players will venture through toward their goal. Entire level will be composed of 20 handmade tile assets that make up walls, doors, and other props, where at least 10 of which are lit (include normal information).
 * 02%: Batteries will be situated throughout the level, and are collected when a player collides with the item. Playing without a flashlight will cause a sanity value to slowly decrease, killing the player when depleted. Also, a player with a depleted flashlight won't be able to see enemies coming through the darkness.
 * 01%: Revive kits will be situated throughout the level, and are collected during collision. Up to 1 can be held at a time, indicated by a UI element. Revive kits are used at the body of a dead player to restore their life.
 * 01%: Ammunition can be collected, and the current amount is represented by a UI element. Available ammunition is reduced when attacking.
-* 02%: Three enemy types will be present: Balanced, Fast and weak (Comes in groups of up to 5), slow and strong (Rare encounter). At each location, there will be 10 - 30 different instances.
+* 02%: Three enemy types will be present: Balanced, Fast and weak (Comes in groups of up to 5), slow and strong (Rare encounter). At each of the 3 buildings, there will be 2 - 5 instances.
 * 01%: Win state: all players reach the end of the level
 * 01%: Lose state: all players are simultaneously dead
 * 08%: Signed distance field implemented
@@ -61,7 +61,7 @@ There will be two components to our lighting system: phong lighting and shadow m
 * 02%: Normal maps computed for all lit sprites
 * 08% Phong lighting computed per-pixel for all lit sprites on screen
 * 10%: Player input data recording and server validation (lag compensation)
-* 12%: Server-client interface: server is run on host's machine
+* 12%: Server-client interface: Players will communicate their position and rotation to the server, which will distribute this information to all clients other than the sender. Similarly, player interactions, like firing and opening a door, are sent. Enemy information, like position and status (alive/dead) are calculated by the server and distributed to all clients. A similar pattern is used to represent bullets and collectible items (batteries, revive kits, ammunition).
 
 ## Stretch Goals
 

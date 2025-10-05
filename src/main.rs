@@ -16,6 +16,7 @@ mod projectile;
 //mod ammo_pickup;
 //mod guns;
 //mod revive_kit_pickup;
+mod slideshow;
 
 const WIN_W: f32 = 1280.;
 const WIN_H: f32 = 720.;
@@ -67,6 +68,7 @@ fn main() {
             tiling::TilingPlugin,
             projectile::ProjectilePlugin,
             enemy::EnemyPlugin,
+            slideshow::CreditsPlugin,
         ))
         .run();
 }

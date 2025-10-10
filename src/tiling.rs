@@ -1,9 +1,7 @@
 use bevy::{prelude::*};
-use crate::{GameState};
+use crate::{GameState, WIN_H, WIN_W};
 
 const TILE_SIZE: u32 = 128;
-const WIN_W: f32 = 1280.;
-const WIN_H: f32 = 720.;
 
 pub struct TilingPlugin;
 impl Plugin for TilingPlugin {
@@ -25,6 +23,7 @@ pub fn setup_tiling(
     let ground_layout_len = ground_layout.textures.len();
     let ground_layout_handle = texture_atlases.add(ground_layout);
 
+    //We currently only tile over the 1280x720 window, we can adjust this to instead work with level size
     let x_bound = WIN_W / 2. - (TILE_SIZE as f32) / 2.;
     let y_bound = WIN_H / 2. - (TILE_SIZE as f32) / 2.;
 

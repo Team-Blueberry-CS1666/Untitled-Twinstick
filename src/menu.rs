@@ -3,6 +3,7 @@ use bevy::prelude::*;
 
 use bevy::input::ButtonInput;
 use bevy::input::keyboard::KeyCode;
+use std::net::UdpSocket;
 
 #[derive(Component)]
 enum MenuButton {
@@ -219,6 +220,8 @@ fn start_on_input(
                 }
                 MenuButton::Join => {
                     info!("join button pressed.");
+                    let socket = UdpSocket::bind("127.0.0.1:24515").expect("couldn't bind to address");
+                    socket.send_to(&[5; 10], "127.0.0.1:2525").expect("couldn't send data");
                 }
                 MenuButton::Credits => {
                     info!("credits button pressed.");

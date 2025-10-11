@@ -5,6 +5,8 @@ use bevy::{
     winit::cursor::{CursorIcon, CustomCursor, CustomCursorImage},
 };
 
+use crate::pickup_system::PickupPlugin;
+
 // Game modules
 mod components;
 mod enemy;
@@ -16,6 +18,7 @@ mod projectile;
 mod tiling;
 mod ui;
 mod server;
+mod pickup_system;
 //mod reticle;
 //mod ground_tiles;
 //mod ammo_pickup;
@@ -52,6 +55,20 @@ fn setup_cursor_icon(
             hotspot: (1, 1),
         })));
 }
+// in main.rs (or your level setup), e.g. when entering Playing
+// use crate::components::Collectible;
+
+// fn spawn_test_pickup(mut commands: Commands) {
+//     commands.spawn((
+//         bevy::prelude::SpriteBundle {
+//             transform: Transform::from_xyz(100.0, 0.0, 0.0),
+//             ..Default::default()
+//         },
+//         Collectible::health(25),
+//     ));
+// }
+
+
 
 fn main() {
     App::new()
@@ -67,6 +84,8 @@ fn main() {
         // GameState init
         .init_state::<GameState>()
         // Core game systems
+        //.add_systems(OnEnter(GameState::Playing), spawn_test_pickup)
+
         .add_systems(Startup, setup_cursor_icon)
         //Plugin Section
         .add_plugins((
@@ -80,7 +99,9 @@ fn main() {
             slideshow::CreditsPlugin,
             game_over::GameOverPlugin,
             server::ServerPlugin,
+            PickupPlugin,
         ))
         .add_event::<events::DamagePlayerEvent>()
         .run();
+        
 }

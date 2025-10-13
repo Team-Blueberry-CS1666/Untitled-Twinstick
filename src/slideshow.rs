@@ -181,7 +181,10 @@ fn countdown(
     }
 }
 
-fn cleanup_credits(mut commands: Commands, query: Query<Entity, With<CreditsUI>>) {
+fn cleanup_credits(
+    mut commands: Commands, 
+    query: Query<Entity, With<CreditsUI>>
+) {
     info!("Cleaning up credits slideshow");
     for entity in &query {
         commands.entity(entity).despawn();

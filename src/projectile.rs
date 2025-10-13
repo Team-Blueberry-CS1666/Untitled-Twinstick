@@ -1,21 +1,16 @@
-use crate::{GameState, player::FireCooldown, player::Player};
-use bevy::input::ButtonInput;
-use bevy::input::mouse::MouseButton;
 use bevy::prelude::*;
+use bevy::input::mouse::MouseButton;
+use bevy::input::ButtonInput;
+use crate::{GameState, player:: Player, player::FireCooldown};
 
 const PROJECTILE_SPEED: f32 = 1000.;
 
 pub struct ProjectilePlugin;
 impl Plugin for ProjectilePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            projectile_inputs.run_if(in_state(GameState::Playing)),
-        )
-        .add_systems(
-            Update,
-            projectile_movement.run_if(in_state(GameState::Playing)),
-        );
+        app
+        .add_systems(Update, projectile_inputs.run_if(in_state(GameState::Playing)))
+        .add_systems(Update, projectile_movement.run_if(in_state(GameState::Playing)));
     }
 }
 
@@ -71,13 +66,13 @@ pub fn projectile_inputs(
 
     if !not_shooting && cooldown.tick(time.delta()) {
         commands.spawn((
-            Sprite::from_image(asset_server.load("textures/bullet.png")),
-            Transform::from_scale(Vec3::splat(0.2)).with_translation(projectile_pos),
-            Velocity {
-                velocity: dir * PROJECTILE_SPEED,
-            },
-            Projectile,
-        ));
+        Sprite::from_image(asset_server.load("textures/bullet.png")),   
+        Transform::from_scale(Vec3::splat(0.2)).with_translation(projectile_pos),
+        Velocity {
+            velocity: dir * PROJECTILE_SPEED,
+        },
+        Projectile,
+    ));
     }
 }
 

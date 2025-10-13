@@ -8,6 +8,6 @@ pub struct DamagePlayerEvent {
 
 impl DamagePlayerEvent {
     pub fn new(target: Entity, amount: i32) -> DamagePlayerEvent {
-        DamagePlayerEvent { target, amount }
+        DamagePlayerEvent{target, amount}
     }
 }

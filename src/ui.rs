@@ -1,11 +1,15 @@
-use crate::{GameState, components::Health, events::DamagePlayerEvent, player::Player};
 use bevy::prelude::*;
+use crate::{GameState,
+            components::Health,
+            events::DamagePlayerEvent,
+            player::Player};
 
 pub struct UIPlugin;
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), setup_ui)
-            .add_systems(Update, player_damage.run_if(in_state(GameState::Playing)));
+        app
+        .add_systems(OnEnter(GameState::Playing), setup_ui)
+        .add_systems(Update, player_damage.run_if(in_state(GameState::Playing)));
     }
 }
 
@@ -24,6 +28,7 @@ pub fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
         Transform::from_xyz(-584., 192., 999.).with_scale(Vec3::new(1., 1., 1.)),
         HealthBar,
     ));
+
 }
 
 pub fn player_damage(

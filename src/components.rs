@@ -8,7 +8,7 @@ pub struct Health {
 
 impl Health {
     pub fn new(max: i32) -> Self {
-        Self { max, current: max }
+        Self {max, current: max}
     }
     pub fn damage(&mut self, amount: i32) -> bool {
         self.current -= amount;

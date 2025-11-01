@@ -4,8 +4,8 @@ use bevy::{
     window::PresentMode,
     winit::cursor::{CursorIcon, CustomCursor, CustomCursorImage},
 };
-
 use crate::pickup_system::PickupPlugin;
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 // Game modules
 mod camera;
@@ -14,7 +14,6 @@ mod collectible;
 mod components;
 mod enemy;
 mod events;
-mod keypress_encoder;
 mod light_manager;
 mod menu;
 mod pickup_system;
@@ -34,6 +33,7 @@ mod collisions;
 mod game_over;
 mod lobby;
 mod slideshow;
+mod net_control;
 
 const WIN_W: f32 = 1280.;
 const WIN_H: f32 = 720.;
@@ -79,6 +79,12 @@ fn main() {
         }))
         // GameState init
         .init_state::<GameState>()
+        .add_plugins(FrameTimeDiagnosticsPlugin{
+            max_history_length: 20,
+            smoothing_factor: 0.1,
+        })
+        .add_plugins(LogDiagnosticsPlugin::default())
+        //.insert_resource(Time::<Fixed>::from_hz(10.0))
         // Core game systems
         //.add_systems(OnEnter(GameState::Playing), spawn_test_pickup)
         .add_systems(Startup, setup_cursor_icon)
@@ -97,14 +103,16 @@ fn main() {
             Material2dPlugin::<player_material::PlayerBaseMaterial>::default(),
             slideshow::CreditsPlugin,
             game_over::GameOverPlugin,
-            server::ServerPlugin,
-            client::ClientPlugin,
-            keypress_encoder::KeyEncodePlugin,
             PickupPlugin,
             camera::CameraPlugin,
             wall::WallPlugin,
+            collisions::CollisionsPlugin,
         ))
-        .add_plugins((lobby::LobbyPlugin, collisions::CollisionsPlugin))
+        .add_plugins((
+            lobby::LobbyPlugin,
+            server::ServerPlugin,
+            client::ClientPlugin,
+        ))
         .add_event::<events::DamagePlayerEvent>()
         .run();
 }

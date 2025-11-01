@@ -2,7 +2,7 @@ use crate::GameState;
 use bevy::prelude::*;
 use std::net::UdpSocket;
 
-const IP_CONST: &str = "127.0.0.1:25125";
+const IP_CONST: &str = "127.0.0.1:";
 
 #[derive(Resource)]
 pub struct SocketResource {
@@ -24,14 +24,20 @@ impl Plugin for ClientPlugin {
             FixedUpdate,
             input_converter.run_if(in_state(GameState::Joining)),
         )
+        .add_systems(
+            FixedUpdate,
+            client_run.run_if(in_state(GameState::Joining)),
+        )
         .add_systems(OnExit(GameState::Playing), client_close);
     }
 }
 
 fn client_init(mut commands: Commands) {
     info!("In client init");
+    //The random port is so I can hard code it and run more than one client at a time.
+    let newIP = IP_CONST.to_owned() + &rand::random_range(25000..25999).to_string();
     commands.insert_resource(SocketResource {
-        socket: UdpSocket::bind(IP_CONST).expect("ERROR"),
+        socket: UdpSocket::bind(newIP).expect("ERROR"),
     });
 }
 
@@ -47,37 +53,37 @@ fn client_close(mut commands: Commands) {
 
 fn client_connect(socket: ResMut<SocketResource>) {
     info!("In client connect");
-    let mut buf = [0; 10];
+    let mut buf = [0];
     socket
         .socket
-        .send_to(&[144], "127.0.0.1:2525")
+        .send_to(&[255], "127.0.0.1:2525")
         .expect("couldn't send data");
     match socket.socket.recv_from(&mut buf) {
         Ok((amt, src)) => {
             info!("{:?} + {:?} + {:?}", amt, src, buf);
         }
         Err(e) => {
-            info!("{:?}", e);
+            //info!("{:?}", e);
         }
     }
 }
 
 fn client_run(socket: ResMut<'_, SocketResource>) {
-    //let mut buf = [0; 10];
-    socket
+    let mut buf = [0];
+    /*socket
         .socket
         .send_to(&[9; 10], "127.0.0.1:2525")
-        .expect("couldn't send data");
+        .expect("couldn't send data");*/
 
-    /*match socket.socket.recv_from(&mut buf)
+    match socket.socket.recv_from(&mut buf)
     {
         Ok((amt, src)) => {
-            info!("{:?} + {:?} + {:?}", amt, src, buf);
+            info!("{:?} + {:?} + {:?}", amt, src, buf); //NEED TO MAKE 
         }
         Err(e) => {
             //info!("ERROR");
         }
-    }*/
+    }
 }
 
 pub fn input_converter(
@@ -86,31 +92,34 @@ pub fn input_converter(
     mouse_button_io: Res<ButtonInput<MouseButton>>,
     socket: ResMut<SocketResource>,
 ) {
-    let mut out: u8 = 0;
+    let mut input_result: u8 = 0;
     //WASDL
     if input.pressed(KeyCode::KeyW) {
-        out += 128;
+        input_result += 128;
     }
 
     if input.pressed(KeyCode::KeyA) {
-        out += 64;
+        input_result += 64;
     }
 
     if input.pressed(KeyCode::KeyS) {
-        out += 32;
+        input_result += 32;
     }
 
     if input.pressed(KeyCode::KeyD) {
-        out += 16;
+        input_result += 16;
     }
 
     if mouse_button_io.pressed(MouseButton::Left) {
-        out += 2;
+        input_result += 2;
     }
+
+    //UPDATE THIS AFTER YOUR GET NET CONTROL FOR CLIENT
+    let angle_result: u8 = 0;
 
     socket
         .socket
-        .send_to(&[out], "127.0.0.1:2525")
+        .send_to(&[input_result, angle_result], "127.0.0.1:2525")
         .expect("couldn't send data");
     //info!("WASD");
     //info!("{:08b}", out);

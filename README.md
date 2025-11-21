@@ -4,7 +4,6 @@ by Team Blueberry
 ## Team Members
 * Advanced Topic Subteam 1: Multiplayer Networking
 	* gcw33: Gordon Wyrostek
-	* ams878: Amyia Singh
 	* ifo2: Ifemi Olojo-Kosoko
 	* zij15: Peter Ju
 
@@ -61,7 +60,7 @@ There will be two components to our lighting system: phong lighting and shadow m
 * 02%: Normal maps computed for all lit sprites
 * 08% Phong lighting computed per-pixel for all lit sprites on screen
 * 10%: Player input data recording and server validation (lag compensation)
-* 12%: Server-client interface: Players will communicate their position and rotation to the server, which will distribute this information to all clients other than the sender. Similarly, player interactions, like firing and opening a door, are sent. Enemy information, like position and status (alive/dead) are calculated by the server and distributed to all clients. A similar pattern is used to represent bullets and collectible items (batteries, revive kits, ammunition).
+* 12%: Server-client interface: Players will communicate their position and rotation to the server, which will distribute this information to all clients other than the sender. Similarly, player interactions, like firing are sent. Enemy position and movement are calculated by the client, while the server designates which player the enemies are targetting. Bullets are deterministic after being created at the position of the player.
 
 ## Stretch Goals
 

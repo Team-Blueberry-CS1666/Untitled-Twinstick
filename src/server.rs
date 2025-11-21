@@ -1,5 +1,5 @@
 use crate::{
-    AssignedType, GameState, LogicType, net_control::NetControl, net_control::PlayerType,
+    AssignedType, GameState, LogicType, net_control::NetControl, net_control::PlayerType, net_control::Local, net_control::Network,
     player::Player, player::Velocity,
 };
 use bevy::input::mouse::MouseButton;
@@ -66,15 +66,10 @@ fn server_init(mut commands: Commands) {
     });
     commands.insert_resource(inFlag { ready: false });
     commands.insert_resource(player_count { count: 1 });
-    commands.spawn((NetControl::new(
-        true,
-        PlayerType::Local,
-        0,
-        Some(SocketAddr::new(
-            IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
-            2525,
-        )),
-    ),));
+    commands.spawn((NetControl::new(true, PlayerType::Local, 0, Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 2525,)),),
+                    Local,
+    ),
+);
 }
 
 fn server_close(mut commands: Commands) {
@@ -108,7 +103,9 @@ fn server_run(
                                     PlayerType::Network,
                                     count.count,
                                     Some(src),
-                                )),
+                                ),
+                                Network,
+                            ),
                             )
                             .id();
                         count.count += 1;

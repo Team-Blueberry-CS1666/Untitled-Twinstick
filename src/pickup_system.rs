@@ -118,87 +118,90 @@ fn pickup_system(
     mut inventory: ResMut<PlayerInventory>,
 ) {
     // single_mut is the non-deprecated call
-    let (player_tf, mut player_health_opt, mut player) = match player_q.single_mut() {
+    /*let (player_tf, mut player_health_opt, mut player) = match player_q.single_mut() {
         Ok(v) => v,
         Err(_) => return,
-    };
+    };*/
 
-    // Handle old collectible system items (components.rs)
-    for (entity, item_tf, col) in old_collectibles_q.iter() {
-        if player_tf.translation.distance(item_tf.translation) > PICKUP_RADIUS {
-            continue;
+    for (player_tf, mut player_health_opt, mut player) in player_q {
+
+        // Handle old collectible system items (components.rs)
+        for (entity, item_tf, col) in old_collectibles_q.iter() {
+            if player_tf.translation.distance(item_tf.translation) > PICKUP_RADIUS {
+                continue;
+            }
+
+            match col.kind {
+                OldCollectibleKind::Health => {
+                    // borrow the inner Health mutably WITHOUT moving it out of the Option
+                    if let Some(h) = player_health_opt.as_deref_mut() {
+                        h.heal(col.amount.max(0));
+                    }
+                }
+                OldCollectibleKind::Ammo => {
+                    let added = inventory.add_to_reserve(col.amount.max(0));
+                    if added > 0 {
+                        ammo_writer.write(AmmoPickupEvent { amount: added });
+                    }
+                }
+                OldCollectibleKind::Battery => {
+                    battery_writer.write(BatteryPickupEvent {
+                        amount: col.amount.max(0),
+                    });
+                }
+                OldCollectibleKind::ReviveKit => {
+                    if inventory.revive_kits < inventory.max_revive_kits {
+                        inventory.revive_kits += 1;
+                        revive_writer.write(ReviveKitPickupEvent);
+                        commands.entity(entity).despawn();
+                        println!("Collected a revive kit! Total: {}", inventory.revive_kits);
+
+                    }
+                }
+            }
+
+            //commands.entity(entity).despawn();
         }
 
-        match col.kind {
-            OldCollectibleKind::Health => {
-                // borrow the inner Health mutably WITHOUT moving it out of the Option
-                if let Some(h) = player_health_opt.as_deref_mut() {
-                    h.heal(col.amount.max(0));
-                }
+        // Handle new collectible system items (collectible.rs)
+        for (entity, item_tf, col) in new_collectibles_q.iter() {
+            if player_tf.translation.distance(item_tf.translation) > PICKUP_RADIUS {
+                continue;
             }
-            OldCollectibleKind::Ammo => {
-                let added = inventory.add_to_reserve(col.amount.max(0));
-                if added > 0 {
-                    ammo_writer.write(AmmoPickupEvent { amount: added });
-                }
-            }
-            OldCollectibleKind::Battery => {
-                battery_writer.write(BatteryPickupEvent {
-                    amount: col.amount.max(0),
-                });
-            }
-            OldCollectibleKind::ReviveKit => {
-                if inventory.revive_kits < inventory.max_revive_kits {
-                    inventory.revive_kits += 1;
-                    revive_writer.write(ReviveKitPickupEvent);
-                    commands.entity(entity).despawn();
-                    println!("Collected a revive kit! Total: {}", inventory.revive_kits);
 
+            match col.collectible_type {
+                NewCollectibleType::Health(amount) => {
+                    if let Some(h) = player_health_opt.as_deref_mut() {
+                        h.heal(amount.max(0));
+                    }
+                }
+                NewCollectibleType::Ammo(amount) => {
+                    let added = inventory.add_to_reserve(amount.max(0));
+                    if added > 0 {
+                        ammo_writer.write(AmmoPickupEvent { amount: added });
+                    }
+                }
+                NewCollectibleType::Battery(amount) => {
+                    battery_writer.write(BatteryPickupEvent {
+                        amount: amount.max(500),
+                    });
+                }
+                NewCollectibleType::ReviveKit => {
+                    if inventory.revive_kits < inventory.max_revive_kits {
+                        inventory.revive_kits += 1;
+                        revive_writer.write(ReviveKitPickupEvent);
+                        commands.entity(entity).despawn();
+                        println!("Collected a revive kit! Total: {}", inventory.revive_kits);
+
+                    }
+                }
+                NewCollectibleType::Flashlight => {
+                    pickup_flashlight(&mut inventory);
                 }
             }
+
+            //commands.entity(entity).despawn();
         }
-
-        //commands.entity(entity).despawn();
-    }
-
-    // Handle new collectible system items (collectible.rs)
-    for (entity, item_tf, col) in new_collectibles_q.iter() {
-        if player_tf.translation.distance(item_tf.translation) > PICKUP_RADIUS {
-            continue;
-        }
-
-        match col.collectible_type {
-            NewCollectibleType::Health(amount) => {
-                if let Some(h) = player_health_opt.as_deref_mut() {
-                    h.heal(amount.max(0));
-                }
-            }
-            NewCollectibleType::Ammo(amount) => {
-                let added = inventory.add_to_reserve(amount.max(0));
-                if added > 0 {
-                    ammo_writer.write(AmmoPickupEvent { amount: added });
-                }
-            }
-            NewCollectibleType::Battery(amount) => {
-                battery_writer.write(BatteryPickupEvent {
-                    amount: amount.max(500),
-                });
-            }
-            NewCollectibleType::ReviveKit => {
-                if inventory.revive_kits < inventory.max_revive_kits {
-                    inventory.revive_kits += 1;
-                    revive_writer.write(ReviveKitPickupEvent);
-                    commands.entity(entity).despawn();
-                    println!("Collected a revive kit! Total: {}", inventory.revive_kits);
-
-                }
-            }
-            NewCollectibleType::Flashlight => {
-                pickup_flashlight(&mut inventory);
-            }
-        }
-
-        //commands.entity(entity).despawn();
     }
 }
 

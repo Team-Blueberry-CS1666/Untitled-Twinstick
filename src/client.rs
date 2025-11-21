@@ -1,5 +1,5 @@
 use crate::{
-    AssignedType, GameState, LogicType, net_control::NetControl, net_control::PlayerType,
+    AssignedType, GameState, LogicType, net_control::NetControl, net_control::PlayerType, net_control::Local, net_control::Network,
     player::Player,
     collectible::PlayerInventory,
 };
@@ -106,15 +106,22 @@ fn client_run(
                     0 => {
                         for i in 0..buf[1] {
                             if i == buf[2] {
-                                commands.spawn(NetControl::new(false, PlayerType::Local, i, None));
+                                commands.spawn(
+                                    (NetControl::new(false, PlayerType::Local, i, None),
+                                    Local,
+                                )
+                            );
                                 info!("I am player: {}", i);
                             } else {
-                                commands.spawn(NetControl::new(
+                                commands.spawn((NetControl::new(
                                     false,
                                     PlayerType::Network,
                                     i,
                                     None,
-                                ));
+                                ),
+                                Network,
+                                )
+                            );
                                 info!("Created net player: {}", i);
                             }
                         }
@@ -150,40 +157,37 @@ pub fn input_converter(
     input: Res<ButtonInput<KeyCode>>,
     mouse_button_io: Res<ButtonInput<MouseButton>>,
     socket: ResMut<SocketResource>,
-    p_loc: Query<&mut NetControl, With<NetControl>>,
+    mut pl_cont: Query<&mut NetControl, (With<NetControl>, With<Local>)>,
     mut inventory: ResMut<PlayerInventory>,
-) {
-    let mut input_result: u8 = 0;
-    //WASD00L0
-    if input.pressed(KeyCode::KeyW) {
-        input_result += 128;
-    }
-
-    if input.pressed(KeyCode::KeyA) {
-        input_result += 64;
-    }
-
-    if input.pressed(KeyCode::KeyS) {
-        input_result += 32;
-    }
-
-    if input.pressed(KeyCode::KeyD) {
-        input_result += 16;
-    }
-
-    //Ideally we would still send the click signal always, but this is easier if we aren't sending ammo info
-    if mouse_button_io.pressed(MouseButton::Left) && inventory.has_available_ammo() {
-        input_result += 2;
-    }
-
-    for i in p_loc {
-        if i.player_type == PlayerType::Local {
-            socket
-                .socket
-                .send_to(&[input_result, i.net_angle], "127.0.0.1:2525")
-                .expect("couldn't send data");
+)   {
+        let mut input_result: u8 = 0;
+        let mut player = pl_cont.single_mut().unwrap();
+        //WASD00L0
+        if input.pressed(KeyCode::KeyW) {
+            input_result += 128;
         }
-    }
+
+        if input.pressed(KeyCode::KeyA) {
+            input_result += 64;
+        }
+
+        if input.pressed(KeyCode::KeyS) {
+            input_result += 32;
+        }
+
+        if input.pressed(KeyCode::KeyD) {
+            input_result += 16;
+        }
+
+        //Ideally we would still send the click signal always, but this is easier if we aren't sending ammo info
+        if mouse_button_io.pressed(MouseButton::Left) && inventory.has_available_ammo() {
+            input_result += 2;
+        }
+
+        socket
+            .socket
+            .send_to(&[input_result, player.net_angle], "127.0.0.1:2525")
+            .expect("couldn't send data");
 
     //info!("WASD");
     //info!("{:08b}", input_result);

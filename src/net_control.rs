@@ -24,6 +24,7 @@ impl NetControl {
     pub fn new(is_host: bool, ptype: PlayerType, pid: u8, addr: Option<SocketAddr>) -> Self {
         Self {
             host: is_host,
+            //I have added single components for both Local and Network, to allow them to go directly on the player
             player_type: ptype,
             player_id: pid,
 
@@ -169,11 +170,17 @@ impl NetControl {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Component, Clone, Copy, PartialEq)]
 pub enum PlayerType {
     Local,
     Network,
 }
+
+#[derive(Component)]
+pub struct Local;
+
+#[derive(Component)]
+pub struct Network;
 
 pub struct NetControlPlugin;
 impl Plugin for NetControlPlugin {
